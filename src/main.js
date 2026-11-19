@@ -130,6 +130,7 @@ emu.onFrame = (lcd, leds) => {
 emu.onStats = ({ speed, load, halted }) => {
   if (booting) return;
   if (halted) { say(`${fw.name}: the emulated CPU halted`, 'bad'); return; }
+  if (emu.audioState !== 'running') { say('sound is paused: tap the synth', 'warn'); return; }
   const slow = load > 0.95;
   say(`${mhz} MHz · ${speed === Infinity ? 'idle' : speed.toFixed(1) + '× real time'} · load ${Math.round(load * 100)}%${slow ? ' · lower the clock in options' : ''}`, slow ? 'warn' : '');
 };
@@ -307,6 +308,11 @@ addEventListener('blur', () => {        // a key let go in another window would 
   for (const id of held.values()) release(id);
   held.clear();
 });
+
+// audio waits for a real gesture (on a phone: the finger lifting), and stops when the page is left
+for (const type of ['pointerup', 'touchend', 'click', 'keydown']) addEventListener(type, () => emu.unlock(), true);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) emu.unlock(); });
+setInterval(() => { if (emu.powered && emu.audioState !== 'running') say('sound is paused: tap the synth', 'warn'); }, 1000);
 
 // MIDI in: every input plays the synth through its MIDI IN jack
 let midi = null;

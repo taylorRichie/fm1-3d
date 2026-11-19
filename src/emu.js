@@ -62,19 +62,36 @@ export class Emulator {
     return { default: c.default, firmwares: c.firmwares.filter((f) => !f.byo && (f.package || f.embedded)) };
   }
 
-  // Needs a user gesture: browsers start audio only after a click or a key.
+  // Needs a user gesture: browsers start audio only after a click or a key. The context is made
+  // before anything is awaited, so it is still inside that gesture (Safari is strict about it).
   async power() {
-    if (this.node) { await this.ac.resume(); return; }
+    if (!this.ac) {
+      // iOS: play like a music app, so the ring / silent switch does not mute the synth
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch { /* older Safari */ }
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ac = new AC({ sampleRate: 44100, latencyHint: 'interactive' });
+    }
+    const ac = this.ac;
+    ac.resume().catch(() => {});
+    if (this.node) return;
     this.wasm ||= await (await fetch('core/fm1_web.wasm')).arrayBuffer();
-    const ac = new AudioContext({ sampleRate: 44100, latencyHint: 'interactive' });
     await ac.audioWorklet.addModule('core/worklet.js');
+    if (this.node) return;
     const node = new AudioWorkletNode(ac, 'fm1', { numberOfInputs: 0, outputChannelCount: [2] });
     node.connect(ac.destination);
     node.port.onmessage = (e) => this.#message(e.data);
-    this.ac = ac;
     this.node = node;
-    await ac.resume();
+    // a touch only counts as a gesture when the finger lifts: unlock() resumes it then
+    if (ac.state !== 'running') await Promise.race([ac.resume().catch(() => {}), new Promise((r) => setTimeout(r, 4000))]);
   }
+
+  // Call from any tap, click or key: starts the audio if the browser held it back, and brings it
+  // back after a phone call or a trip to another app.
+  unlock() {
+    if (this.ac && this.ac.state !== 'running') this.ac.resume().catch(() => {});
+  }
+
+  get audioState() { return this.ac ? this.ac.state : 'off'; }
 
   async package(fw) {
     if (fw.bytes) return { bytes: fw.bytes, url: null };

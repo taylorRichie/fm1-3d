@@ -73,6 +73,7 @@ kbd { display: inline-block; min-width: 18px; padding: 1px 4px; border: 1px soli
 
 @media (max-width: 640px) {
   .status { display: none; }
+  .status.warn, .status.bad { display: block; position: fixed; top: calc(var(--top) + 8px); left: 8px; right: 8px; padding: 6px 10px; background: rgba(11, 11, 12, .85); border-radius: 3px; z-index: 4; text-align: center; }
   .picker .dim { display: none; }
   .bar.bottom button { font-size: 11px; }
 }
