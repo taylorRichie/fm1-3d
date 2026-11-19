@@ -16,6 +16,7 @@ project puts a 3D model of the hardware in front of that core.
 - Keys, buttons and knobs work with mouse and touch; the keys sink, the knobs turn, and the backlights follow the firmware's LED output.
 - Computer keyboard mapping (the **keys** button shows it) and Web MIDI input.
 - Views: overview, top, screen, keys, rear, and bottom (the synth turns over).
+- **Player** view for phones: the synth fills the screen from above with the camera locked, so every touch plays it. Add `?player` to the address to open straight into it.
 - Five colourways.
 - Patches and settings a firmware saves are kept in the browser, per firmware.
 

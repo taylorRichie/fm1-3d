@@ -101,7 +101,49 @@ function goTo(name, instant = false) {
   }
   flight = { t: 0, from: { position: camera.position.clone(), target: controls.target.clone() }, to };
 }
-$('views').addEventListener('click', (e) => { if (e.target.dataset.view) goTo(e.target.dataset.view); });
+$('views').addEventListener('click', (e) => {
+  const view = e.target.dataset.view;
+  if (view === 'player') setPlayer(true);
+  else if (view) goTo(view);
+});
+
+// Player: the synth alone, seen from straight above and filling the window, the camera locked,
+// so every drag plays it. On an upright phone it lies along the screen: turn the phone to play.
+let player = false, wakeLock = null;
+function playerCamera() {
+  const w = stage.clientWidth, h = stage.clientHeight, upright = h > w;
+  const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  // what the screen's width and height must hold (the knobs stand nearer the camera: a margin)
+  const across = (upright ? DH : DW) + 0.35, down = (upright ? DW : DH) + 0.35;
+  const dist = Math.max(down / (2 * half), across / (2 * half * camera.aspect));
+  camera.position.set(0, dist, 0);
+  camera.up.set(upright ? 1 : 0, 0, upright ? 0 : -1);
+  camera.lookAt(0, 0, 0);
+}
+function setPlayer(on) {
+  if (on === player) return;
+  player = on;
+  document.body.classList.toggle('player', on);
+  closePanels();
+  flight = null;
+  controls.enabled = !on;
+  if (on) {
+    flipTo = 0;
+    currentView = null;
+    // where the browser has them: the whole screen, and a screen that stays awake
+    document.documentElement.requestFullscreen?.({ navigationUI: 'hide' })?.catch(() => {});
+    navigator.wakeLock?.request('screen').then((lock) => { wakeLock = lock; }).catch(() => {});
+    resize();
+  } else {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    wakeLock?.release().catch(() => {});
+    wakeLock = null;
+    camera.up.set(0, 1, 0);
+    resize();
+    goTo('overview', true);
+  }
+}
+$('player-exit').addEventListener('click', () => setPlayer(false));
 controls.addEventListener('start', () => {
   flight = null;
   currentView = null;
@@ -113,7 +155,8 @@ function resize() {
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
-  if (currentView) goTo(currentView, true);
+  if (player) playerCamera();
+  else if (currentView) goTo(currentView, true);
 }
 new ResizeObserver(resize).observe(stage);
 
@@ -213,7 +256,7 @@ stage.addEventListener('pointerdown', (e) => {
   if (e.button > 0) return;
   const ctl = pick(e);
   if (!ctl) {
-    controls.enabled = pointers.size === 0;
+    controls.enabled = !player && pointers.size === 0;
     if (!emu.powered && !booting) boot();
     return;
   }
@@ -258,7 +301,7 @@ function lift(e) {
   if (!p) return;
   if (p.held >= 0) release(p.held);
   pointers.delete(e.pointerId);
-  if (pointers.size === 0) controls.enabled = true;
+  if (pointers.size === 0) controls.enabled = !player;
 }
 canvas.addEventListener('pointerup', lift);
 canvas.addEventListener('pointercancel', lift);
@@ -286,7 +329,7 @@ function keyId(k, shift) {
 }
 addEventListener('keydown', (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey || e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
-  if (e.key === 'Escape') { closePanels(); return; }
+  if (e.key === 'Escape') { closePanels(); if (player) setPlayer(false); return; }
   const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
   const enc = KEY_ENCS[k];
   if (enc) { e.preventDefault(); turn(enc[0], enc[1]); return; }
@@ -425,7 +468,7 @@ renderer.setAnimationLoop((now) => {
     device.group.rotation.x = k * Math.PI;
     device.group.position.y = k * FLIP_Y + Math.sin(k * Math.PI) * 4.2;   // lifted clear of the felt as it turns
   }
-  controls.update();
+  if (!player) controls.update();
   device.update(dt);
   renderer.render(scene, camera);
 });
@@ -439,4 +482,5 @@ try {
 }
 
 // for scripts and the console: drive the synth without a mouse
-window.fm1 = { emu, device, press, release, turn, setPot, boot, goTo, setTheme };
+window.fm1 = { emu, device, press, release, turn, setPot, boot, goTo, setTheme, setPlayer };
+if (new URLSearchParams(location.search).has('player')) setPlayer(true);

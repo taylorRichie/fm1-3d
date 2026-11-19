@@ -77,3 +77,11 @@ kbd { display: inline-block; min-width: 18px; padding: 1px 4px; border: 1px soli
   .picker .dim { display: none; }
   .bar.bottom button { font-size: 11px; }
 }
+
+/* the player view: the synth alone, nothing else on screen but the way out */
+.bar.bottom button:nth-child(7) { background: var(--accent); color: #111; }
+#player-exit { display: none; position: fixed; top: calc(env(safe-area-inset-top) + 8px); left: calc(env(safe-area-inset-left) + 8px); z-index: 7; background: rgba(11, 11, 12, .55); border-color: rgba(255, 255, 255, .18); opacity: .7; }
+body.player #player-exit { display: inline-flex; }
+body.player .bar, body.player .hint { display: none; }
+body.player #stage { inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+body.player { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: none; }
