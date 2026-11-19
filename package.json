@@ -1,0 +1,11 @@
+{
+  "name": "fm1-3d",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "python3 -m http.server 8650",
+    "sync-core": "bash ../fm1-emu/web/build.sh && cp ../fm1-emu/web/dist/fm1_web.wasm ../fm1-emu/web/dist/worklet.js ../fm1-emu/web/dist/fwsc.js ../fm1-emu/web/dist/persistence.js ../fm1-emu/web/dist/firmwares.json core/"
+  },
+  "license": "MIT",
+  "description": "A three.js simulator of the M-VAVE FM-1, running real firmware on the fm1-emu core",
+  "private": true
+}

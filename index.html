@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>FM-1 · 3D Simulator</title>
+<meta name="description" content="A three.js model of the M-VAVE FM-1 pocket synth that runs real firmware in the browser. Unofficial.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+</script>
+</head>
+<body>
+<div id="stage"><canvas id="view"></canvas></div>
+
+<header class="bar top">
+  <div class="left">
+    <button id="power" class="btn" title="Power (boots the selected firmware)"><span class="led"></span><span id="power-text">power on</span></button>
+    <span id="status" class="status">off</span>
+  </div>
+  <button id="fw-open" class="btn picker"><span class="dim">firmware</span><span id="fw-name">…</span><span class="caret">▾</span></button>
+  <div class="right">
+    <button id="help-open" class="btn">keys</button>
+    <button id="opt-open" class="btn">options</button>
+  </div>
+</header>
+
+<nav class="bar bottom" id="views">
+  <button data-view="overview" class="on">overview</button>
+  <button data-view="top">top</button>
+  <button data-view="screen">screen</button>
+  <button data-view="keys">keys</button>
+  <button data-view="rear">rear</button>
+  <button data-view="bottom">bottom</button>
+</nav>
+
+<div id="hint" class="hint">click the synth, or press any key, to power on</div>
+
+<aside id="fw-panel" class="panel wide" hidden>
+  <div class="panel-head">
+    <input id="fw-search" type="search" placeholder="search 200+ firmwares…" autocomplete="off" spellcheck="false">
+    <label class="btn file">open .fwsc…<input id="fw-file" type="file" accept=".fwsc,.ufw,.bin" hidden></label>
+    <button class="btn close" data-close>✕</button>
+  </div>
+  <ul id="fw-list"></ul>
+  <p class="foot">Firmwares belong to their authors and are fetched from <a href="https://thefirmwarehub.com/" target="_blank" rel="noopener">The Firmware Hub</a> when you pick one. Emulation by <a href="https://github.com/joakimeriksson/fm1-emu" target="_blank" rel="noopener">fm1-emu</a>.</p>
+</aside>
+
+<aside id="opt-panel" class="panel" hidden>
+  <div class="panel-head"><strong>options</strong><button class="btn close" data-close>✕</button></div>
+  <div class="row"><span>colourway</span><div id="swatches" class="swatches"></div></div>
+  <div class="row"><span>clock</span><select id="mhz"></select></div>
+  <div class="row"><span>MIDI in</span><button id="midi" class="btn">connect</button></div>
+  <div class="row"><span>maker's logo</span><input id="brand" type="checkbox" checked></div>
+  <div class="row"><span>saved patches</span><button id="reset" class="btn">factory reset</button></div>
+  <p class="foot" id="midi-note">The real FM-1 runs at 240 MHz. Lower the clock if the sound breaks up.</p>
+</aside>
+
+<aside id="help-panel" class="panel" hidden>
+  <div class="panel-head"><strong>controls</strong><button class="btn close" data-close>✕</button></div>
+  <table class="keys">
+    <tr><th colspan="2">mouse &amp; touch</th></tr>
+    <tr><td>click / tap</td><td>keys and buttons (drag across keys to slide)</td></tr>
+    <tr><td>drag ↕ or scroll</td><td>on a knob: turn it</td></tr>
+    <tr><td>drag elsewhere</td><td>orbit the camera · scroll / pinch to zoom</td></tr>
+    <tr><th colspan="2">keyboard</th></tr>
+    <tr><td><kbd>A</kbd> <kbd>W</kbd> <kbd>S</kbd> <kbd>E</kbd> <kbd>D</kbd> … <kbd>'</kbd></td><td>notes C4 – F5</td></tr>
+    <tr><td><kbd>Z</kbd> <kbd>X</kbd></td><td>OCT− / OCT+</td></tr>
+    <tr><td><kbd>1</kbd> – <kbd>6</kbd></td><td>FX · SEL · ENV · LFO · EDIT · GLO</td></tr>
+    <tr><td><kbd>7</kbd> – <kbd>0</kbd></td><td>HOME · SAVE · ARP · SEQ</td></tr>
+    <tr><td><kbd>Space</kbd> / <kbd>⇧ Space</kbd></td><td>PLAY/STOP / REC</td></tr>
+    <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>SELECT</td></tr>
+    <tr><td><kbd>↓</kbd> <kbd>↑</kbd></td><td>PRESETS</td></tr>
+    <tr><td><kbd>,</kbd> <kbd>.</kbd></td><td>ALGORITHM</td></tr>
+    <tr><td><kbd>[</kbd> <kbd>]</kbd> · <kbd>-</kbd> <kbd>=</kbd></td><td>KNOB1 · KNOB2</td></tr>
+    <tr><td><kbd>C</kbd> <kbd>V</kbd> · <kbd>B</kbd> <kbd>N</kbd></td><td>KNOB3 · KNOB4</td></tr>
+  </table>
+</aside>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
