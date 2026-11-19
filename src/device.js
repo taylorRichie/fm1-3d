@@ -1,7 +1,7 @@
 // The FM-1 as a three.js model, built from primitives: body with recessed trays, glass screen
 // with the live LCD, knurled knobs, silicone buttons and pill keys with their backlights.
 import * as THREE from 'three';
-import { BODY, FOOT, S, BEZEL, LCD, LOGO, POT, ENCS, KNOB_R, KNOB_H, LABEL_DV, TRAYS, BUTTONS, KEYS, DOTS, BTN_DOT, THEMES } from './layout.js';
+import { BODY, FOOT, S, BEZEL, LCD, LOGO, POT, ENCS, KNOB_R, KNOB_H, LABEL_DV, TRAYS, BUTTONS, KEYS, DOTS, BTN_DOT, THEMES } from './layout.js?v=20261118210803';
 
 const RECESS = 0.07;                         // how deep the trays sit below the top face
 const X = (u) => (u - BODY.w / 2) * S;

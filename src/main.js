@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { Device } from './device.js';
-import { Emulator } from './emu.js';
-import { BODY, FOOT, KNOB_H, S, ENCS, PIANO, PIANO_BASE, KEY_BUTTONS, KEY_ENCS, THEMES } from './layout.js';
+import { Device } from './device.js?v=20261118210803';
+import { Emulator } from './emu.js?v=20261118210803';
+import { BODY, FOOT, KNOB_H, S, ENCS, PIANO, PIANO_BASE, KEY_BUTTONS, KEY_ENCS, THEMES } from './layout.js?v=20261118210803';
 
 const $ = (id) => document.getElementById(id);
 const store = {
@@ -102,7 +102,7 @@ function goTo(name, instant = false) {
   flight = { t: 0, from: { position: camera.position.clone(), target: controls.target.clone() }, to };
 }
 $('views').addEventListener('click', (e) => {
-  const view = e.target.dataset.view;
+  const view = e.target.closest('[data-view]')?.dataset.view;
   if (view === 'player') setPlayer(true);
   else if (view) goTo(view);
 });
@@ -131,12 +131,12 @@ function setPlayer(on) {
     flipTo = 0;
     currentView = null;
     // where the browser has them: the whole screen, and a screen that stays awake
-    document.documentElement.requestFullscreen?.({ navigationUI: 'hide' })?.catch(() => {});
-    navigator.wakeLock?.request('screen').then((lock) => { wakeLock = lock; }).catch(() => {});
+    try { document.documentElement.requestFullscreen?.({ navigationUI: 'hide' })?.catch(() => {}); } catch { /* not on this browser */ }
+    try { navigator.wakeLock?.request('screen').then((lock) => { wakeLock = lock; }).catch(() => {}); } catch { /* not on this browser */ }
     resize();
   } else {
-    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
-    wakeLock?.release().catch(() => {});
+    try { if (document.fullscreenElement) document.exitFullscreen?.()?.catch(() => {}); } catch { /* was not full screen */ }
+    try { wakeLock?.release()?.catch(() => {}); } catch { /* already released */ }
     wakeLock = null;
     camera.up.set(0, 1, 0);
     resize();

@@ -1,8 +1,8 @@
 // The machine: fm1-emu's WebAssembly core (core/fm1_web.wasm, MIT, by Joakim Eriksson) running in
 // an AudioWorklet (core/worklet.js). This file only talks to that worklet: boot a firmware
 // package, send keys / encoders / the pot / MIDI, and hand back LCD frames and LED levels.
-import { fetchPackage } from '../core/fwsc.js';
-import { packageHash, changedSectors, packSectors } from '../core/persistence.js';
+import { fetchPackage } from '../core/fwsc.js?v=20261118210803';
+import { packageHash, changedSectors, packSectors } from '../core/persistence.js?v=20261118210803';
 
 // Flash saves (patches, settings) per firmware package, kept in IndexedDB by the package's hash.
 const saves = {
