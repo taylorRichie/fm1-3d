@@ -54,6 +54,7 @@ For scripting, the page exposes `window.fm1` with `press(id)`, `release(id)`, `t
 
 ## Credits and licences
 
+- Inspired by [OP-1 Field: Interactive Study](https://mitchivin.github.io/te-op1-field/) by mitchivin.
 - This project: MIT, see `LICENSE`.
 - Emulator core in `core/`: [fm1-emu](https://github.com/joakimeriksson/fm1-emu), MIT, see `core/LICENSE-fm1-emu`.
 - [three.js](https://threejs.org/): MIT, see `vendor/three/LICENSE`.
